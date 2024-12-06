@@ -14,7 +14,7 @@ const WebsiteDashboard = () => {
     <div className="w-full min-h-screen px-4 py-6 sm:px-0 overflow-auto bg-gray-100">
       <Tab.Group>
         <Tab.List className="flex space-x-4 justify-center bg-blue-900/20 p-2 rounded-md">
-          {["IN", "COM"].map((tab) => (
+          {["Stage1", "Stage2", "Stage3"].map((tab) => (
             <Tab
               key={tab}
               className={({ selected }) =>
@@ -33,10 +33,13 @@ const WebsiteDashboard = () => {
         </Tab.List>
         <Tab.Panels className="mt-4">
           <Tab.Panel className="w-full">
-            <In />
+            <Stage1 />
           </Tab.Panel>
           <Tab.Panel className="w-full">
-            <Com />
+            <Stage2 />
+          </Tab.Panel>
+          <Tab.Panel className="w-full">
+            <Stage3 />
           </Tab.Panel>
         </Tab.Panels>
       </Tab.Group>

@@ -31,6 +31,8 @@ const UserTable = ({
     { title: 'Batch (AMAZON)', dataIndex: 'batchAmazon' },
     { title: 'Name', dataIndex: 'name' },
     { title: 'Email', dataIndex: 'email' },
+    { title: 'Primary Contact', dataIndex: 'primaryContact' },
+    { title: 'Secondary Contact', dataIndex: 'secondaryContact' },
     { title: 'Password', dataIndex: 'password' },
     {
       title: 'Assigned Managers',
