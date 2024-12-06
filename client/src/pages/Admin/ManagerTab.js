@@ -108,6 +108,9 @@ const ManagerTab = () => {
                 <Form.Item name="service">
                      <Input placeholder="Manager Service"/>   
                 </Form.Item>
+                <Form.Item name="primaryContact">
+                     <Input placeholder="Manager Primary Contact"/>   
+                </Form.Item>
                 <Form.Item name="password" rules={[{ required: true, message: 'Password is required' }]}>
                       <Input.Password placeholder="Password"/>  
                 </Form.Item>
@@ -123,6 +126,7 @@ const ManagerTab = () => {
                 { title: 'Position', dataIndex: 'uid' },
                 { title: 'Name', dataIndex: 'name' },
                 { title: 'Email', dataIndex: 'email' },
+                { title: 'Primary Contact', dataIndex: 'primaryContact' },
                 { title: 'Service', dataIndex: 'service' },
                 { title: 'Password', dataIndex: 'password' },
                 {

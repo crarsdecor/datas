@@ -78,6 +78,19 @@ const UserModal = ({ visible, onClose, fetchUsers, managers }) => {
           <Input placeholder="Enter user email" />
         </Form.Item>
         <Form.Item
+          name="primaryContact"
+          label="Primary Contact"
+          rules={[{ required: true, message: 'Primary Contact is required' }]}
+        >
+          <Input placeholder="Enter Contact" />
+        </Form.Item>
+        <Form.Item
+          name="secondaryContact"
+          label="Secondary Contact"
+        >
+          <Input placeholder="Enter Contact" />
+        </Form.Item>
+        <Form.Item
           name="password"
           label="Password"
           rules={[{ required: true, message: 'Password is required' }]}

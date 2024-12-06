@@ -1,4 +1,5 @@
-import { User, ROLES } from "../model/userModel.js";
+import { User, ROLES } from '../model/userModel.js';
+
 
 // export const createUser = async (req, res) => {
 //   try {
@@ -109,6 +110,8 @@ export const createUser = async (req, res) => {
   }
 };
 
+
+
 // Get all users or filter by role
 // export const getUsers = async (req, res) => {
 //   try {
@@ -121,6 +124,7 @@ export const createUser = async (req, res) => {
 //     res.status(500).json({ message: error.message });
 //   }
 // };
+
 
 export const getUsers = async (req, res) => {
   try {
@@ -144,36 +148,6 @@ export const getUsers = async (req, res) => {
 };
 
 // Update user (assign/unassign managers)
-// export const updateUser = async (req, res) => {
-//   try {
-//     const { userId } = req.params;
-//     const { name, email, password, managerIds } = req.body;
-
-//     const user = await User.findById(userId);
-//     if (!user) {
-//       return res.status(404).json({ message: 'User not found' });
-//     }
-
-//     if (managerIds) {
-//       // Validate all provided manager IDs
-//       const managers = await User.find({ _id: { $in: managerIds }, role: ROLES.MANAGER });
-//       if (managers.length !== managerIds.length) {
-//         return res.status(400).json({ message: 'One or more managers not found or invalid' });
-//       }
-//       user.managers = managerIds; // Assign new managers
-//     }
-
-//     if (name) user.name = name;
-//     if (email) user.email = email;
-//     if (password) user.password = password;
-
-//     await user.save();
-
-//     res.status(200).json({ message: 'User updated successfully', user });
-//   } catch (error) {
-//     res.status(500).json({ message: error.message });
-//   }
-// };
 
 export const updateUser = async (req, res) => {
   try {
@@ -229,35 +203,15 @@ export const deleteUser = async (req, res) => {
   }
 };
 
+
+
 // Get a user by ID to check service type (Amazon or Website)
-// export const getUserById = async (req, res) => {
-//   try {
-//     const { userId } = req.params; // userId is the ObjectId
-
-//     // Find user by ObjectId
-//     const user = await User.findById(userId);
-//     if (!user) {
-//       return res.status(404).json({ message: 'User not found' });
-//     }
-
-//     // Check if the user is a manager and return their service
-//     if (user.role === ROLES.MANAGER) {
-//       return res.status(200).json({ service: user.service });
-//     }
-
-//     // Return a message if the user is not a manager
-//     return res.status(400).json({ message: 'User is not a manager' });
-//   } catch (error) {
-//     res.status(500).json({ message: error.message });
-//   }
-// };
-
 export const getUserById = async (req, res) => {
   try {
     const { userId } = req.params; // Extract userId from request parameters
 
-    // Find user by ObjectId and populate managers
-    const user = await User.findById(userId).populate("managers", "name email");
+    // Find user by ObjectId
+    const user = await User.findById(userId).populate('managers', 'name email'); // Populate managers if needed
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
