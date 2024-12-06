@@ -21,7 +21,7 @@ const paymentStageSchema = new mongoose.Schema({
 const userSchema = new Schema(
   {
     name: { type: String, required: true },
-    email: { type: String, required: true, unique: true },
+    email: { type: String, },
     password: { type: String, },
     primaryContact: { type: String, },
     role: { type: String, enum: Object.values(ROLES), default: ROLES.USER },
