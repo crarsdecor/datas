@@ -1,13 +1,11 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import DashboardAdmin from './pages/Dashboard';
-import DashboardManager from './pages/Manager/ManagerDashboard';
 import Signin from './pages/signin/Signin';
 import ProtectedRoute from './ProtectedRoute';
-import UserDashboard from './pages/User/UserDashboard';
-import AccountantDashboard from './pages/Accountant/AccountantDashboard';
 import NotFound from './NotFound';
 import Unauthorized from './Unauthorized';
+import List from './pages/Admin/List';
 
 
 const App = () => (
@@ -28,29 +26,11 @@ const App = () => (
           </ProtectedRoute>
         }
       />
-
-      {/* Manager dashboard (accessible by admin and manager) */}
       <Route
-        path="/dashboard-manager"
+        path="/list"
         element={
-          <ProtectedRoute allowedRoles={['manager', 'admin']}>
-            <DashboardManager />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/dashboard-user"
-        element={
-          <ProtectedRoute allowedRoles={['manager', 'admin', 'user']}>
-            <UserDashboard />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/dashboard-accountant"
-        element={
-          <ProtectedRoute allowedRoles={['accountant', 'admin', ]}>
-            <AccountantDashboard />
+          <ProtectedRoute allowedRoles={['admin']}>
+            <List />
           </ProtectedRoute>
         }
       />

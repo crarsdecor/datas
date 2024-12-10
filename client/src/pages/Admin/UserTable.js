@@ -82,11 +82,14 @@ const UserTable = ({
 
   return (
     <Table
+      className="bg-gray-800 text-gray-100"
       dataSource={users}
       rowKey="_id"
       columns={columns}
       scroll={{ x: 1200 }} // Enable horizontal scrolling for responsiveness
+      bordered
     />
+  
   );
 };
 

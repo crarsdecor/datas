@@ -1,130 +1,168 @@
-// import React from 'react';
-// import { Card, Tabs, Button } from 'antd';
-// import { LogoutOutlined } from '@ant-design/icons';
-// import ManagerDashboard from './Admin/ManagerTab';
-// import UserDashboard from './Admin/UserTab';
-// import AccountantTab from './Admin/Accountant/AccountantTab';
+import React, { useEffect, useState } from 'react';
+import { Button, message, Upload } from 'antd';
+import { UploadOutlined, DownloadOutlined, UserAddOutlined } from '@ant-design/icons';
+import { motion } from 'framer-motion';
+import axios from 'axios';
+import UserModal from './Admin/UserModal';
+import Header from './layout/Header';
+import Footer from './layout/Footer';
+import vid from './vid.mp4';
+import Graph from '../pages/Admin/Graph';
 
-// const { TabPane } = Tabs;
+const apiUrl = process.env.REACT_APP_BACKEND_URL;
 
-// const Dashboard = () => {
-//   const handleLogout = () => {
-//     localStorage.clear(); // Clear all local storage
-//     window.location.reload(); // Optionally redirect to the login page
-//   };
+const UserTab = () => {
+  const [users, setUsers] = useState([]);
+  const [managers, setManagers] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [isModalVisible, setIsModalVisible] = useState(false);
 
-//   return (
-//     <div style={{ padding: '24px', display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', background: '#f5f5f5' }}>
-//       <Card
-//         style={{
-//           width: '100%',
-//           maxWidth: '1200px',
-//           borderRadius: '8px',
-//           boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
-//         }}
-//         bodyStyle={{ padding: '24px' }}
-//       >
-//         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-//           <h2 style={{ margin: 0 }}>Dashboard</h2>
-//           <Button
-//             type="primary"
-//             danger
-//             icon={<LogoutOutlined />}
-//             onClick={handleLogout}
-//           >
-//             Logout
-//           </Button>
-//         </div>
-//         <Tabs defaultActiveKey="1" centered>
-//           <TabPane tab="Manage Managers" key="1">
-//             <ManagerDashboard />
-//           </TabPane>
-//           <TabPane tab="Manage Users" key="2">
-//             <UserDashboard />
-//           </TabPane>
-//           <TabPane tab="Manage Accountant" key="3">
-//             <AccountantTab />
-//           </TabPane>
-//         </Tabs>
-//       </Card>
-//     </div>
-//   );
-// };
+  const fetchUsers = async () => {
+    try {
+      const { data } = await axios.get(`${apiUrl}/api/users?role=user`);
+      setUsers(data);
+    } catch (error) {
+      message.error('Failed to fetch users');
+    }
+  };
 
-// export default Dashboard;
+  const fetchManagers = async () => {
+    try {
+      const { data } = await axios.get(`${apiUrl}/api/users?role=manager`);
+      setManagers(data);
+    } catch (error) {
+      message.error('Failed to fetch managers');
+    }
+  };
 
+  useEffect(() => {
+    fetchUsers();
+    fetchManagers();
+  }, []);
 
+  const handleCsvUpload = async (file) => {
+    const formData = new FormData();
+    formData.append('file', file);
 
+    try {
+      setLoading(true);
+      await axios.post(`${apiUrl}/api/upload`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      message.success('CSV uploaded successfully');
+      fetchUsers();
+    } catch (error) {
+      message.error('Failed to upload CSV');
+    } finally {
+      setLoading(false);
+    }
+  };
 
-import React from "react";
-import { Tabs, Button, Layout, Typography, Space } from "antd";
-import { LogoutOutlined } from "@ant-design/icons";
-import { motion } from "framer-motion";
-import ManagerDashboard from './Admin/ManagerTab';
-import UserDashboard from './Admin/UserTab';
-import AccountantTab from './Admin/Accountant/AccountantTab';
-import "./Dashboard.css";
+  const handleDownloadSample = () => {
+    const link = document.createElement('a');
+    link.href = '/Sample.csv'; // Replace with the correct path to your local file
+    link.download = 'Sample.csv';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
-const { TabPane } = Tabs;
-const { Content, Footer } = Layout;
-const { Title, Text } = Typography;
-
-const Dashboard = () => {
   const handleLogout = () => {
     localStorage.clear();
-    window.location.reload();
+    message.success('Logged out successfully');
+    window.location.href = '/'; // Redirect to login page
   };
 
   return (
-    <Layout style={{ minHeight: "100vh", background: "#f4f4f4" }}>
-      <motion.div
-        initial={{ y: -20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.6, ease: "easeOut" }}
-        className="header-container"
+    <div className="relative min-h-screen flex flex-col">
+      {/* Background Video */}
+      <motion.video
+        autoPlay
+        loop
+        muted
+        playsInline
+        className="absolute inset-0 w-full h-full object-cover"
+        initial={{ scale: 1.1 }}
+        animate={{ scale: 1 }}
+        transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
       >
-        <div className="header-content">
-          <Title level={3} style={{ color: "#fff", margin: 0, textShadow: "2px 2px 4px rgba(0,0,0,0.6)" }}>
-            Admin Dashboard
-          </Title>
-          <Button type="primary" danger icon={<LogoutOutlined />} onClick={handleLogout}>
-            Logout
-          </Button>
-        </div>
+        <source src={vid} type="video/mp4" />
+        Your browser does not support the video tag.
+      </motion.video>
+
+      {/* Subtle Foreground */}
+      <motion.div
+        className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-black opacity-60"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 0.6 }}
+        transition={{ duration: 1.5, ease: "easeInOut" }}
+      />
+
+      <Header onLogout={handleLogout} />
+
+      <motion.div
+        className="flex-grow flex flex-col items-center justify-center space-y-6 px-4 relative z-10"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 1 }}
+      >
+             <Graph users={users} />
+
+        <h1 className="text-3xl font-semibold text-white mb-4">
+          Manage Your Users
+        </h1>
+        <div className="flex flex-wrap items-center justify-center gap-4">
+  <Button
+    type="primary"
+    icon={<UserAddOutlined />}
+    size="large"
+    onClick={() => setIsModalVisible(true)}
+    className="flex items-center justify-center px-6 py-3 rounded-lg shadow-md"
+  >
+    Add User
+  </Button>
+  <Upload
+    beforeUpload={(file) => {
+      handleCsvUpload(file);
+      return false;
+    }}
+    accept=".csv"
+    showUploadList={false}
+  >
+    <Button
+      type="default"
+      icon={<UploadOutlined />}
+      size="large"
+      loading={loading}
+      className="flex items-center justify-center px-6 py-3 rounded-lg shadow-md"
+    >
+      Bulk Import CSV
+    </Button>
+  </Upload>
+  <Button
+    type="default"
+    icon={<DownloadOutlined />}
+    size="large"
+    onClick={handleDownloadSample}
+    className="flex items-center justify-center px-6 py-3 rounded-lg shadow-md"
+  >
+    Download Sample CSV
+  </Button>
+</div>
+
+        <UserModal
+          visible={isModalVisible}
+          onClose={() => setIsModalVisible(false)}
+          fetchUsers={fetchUsers}
+          managers={managers}
+        />
       </motion.div>
-      <Content style={{ padding: "24px", width: "100%", overflowX: "auto", paddingTop: "4rem" }}>
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-        >
-          <Tabs defaultActiveKey="1" tabBarStyle={{ marginBottom: "24px" }} size="large">
-            <TabPane tab="Managers" key="1">
-              <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.5 }}>
-                <ManagerDashboard />
-              </motion.div>
-            </TabPane>
-            <TabPane tab="Users" key="2">
-              <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.5 }}>
-                <UserDashboard />
-              </motion.div>
-            </TabPane>
-            <TabPane tab="Accountants" key="3">
-              <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.5 }}>
-                <AccountantTab />
-              </motion.div>
-            </TabPane>
-          </Tabs>
-        </motion.div>
-      </Content>
-      <Footer style={{ textAlign: "center" }}>
-        <Space split={<span style={{ color: "#d9d9d9" }}>|</span>}>
-          <Text style={{ color: "#001529", fontWeight: "500", fontSize: "14px" }}>Crarts Decor ©2024</Text>
-          <Text style={{ color: "#1890ff", fontWeight: "500", fontSize: "14px" }}>Powered by CreativeAvi</Text>
-        </Space>
-      </Footer>
-    </Layout>
+
+      <Footer />
+    </div>
   );
 };
 
-export default Dashboard;
+export default UserTab;

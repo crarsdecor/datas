@@ -1,4 +1,3 @@
-import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { User, ROLES } from '../model/userModel.js';
 
@@ -30,69 +29,6 @@ export const signupAdmin = async (req, res) => {
 };
 
 // Signin
-
-// export const signin = async (req, res) => {
-//   try {
-//     const { email, password } = req.body;
-
-//     const user = await User.findOne({ email });
-//     if (!user) return res.status(404).json({ message: 'User not found' });
-
-//     const isMatch = await bcrypt.compare(password, user.password);
-//     if (!isMatch) return res.status(401).json({ message: 'Invalid credentials' });
-
-//     const token = jwt.sign({ id: user._id, role: user.role }, SECRET_KEY, { expiresIn: '1h' });
-
-//     res.status(200).json({ token });
-//   } catch (error) {
-//     res.status(500).json({ message: 'Error during signin', error: error.message });
-//   }
-// };
-
-
-
-// export const signin = async (req, res) => {
-//   try {
-//     const { email, name, uid, password } = req.body;
-
-//     let user;
-//     let isMatch = false;
-
-//     if (email) {
-//       // Admin Signin
-//       user = await User.findOne({ email, role: ROLES.ADMIN });
-//       if (!user) return res.status(404).json({ message: 'Admin not found' });
-
-//       isMatch = await bcrypt.compare(password, user.password);
-//       if (!isMatch) return res.status(401).json({ message: 'Invalid credentials for admin' });
-//     } else if (name) {
-//       // Manager Signin
-//       user = await User.findOne({ name, role: ROLES.MANAGER });
-//       if (!user) return res.status(404).json({ message: 'Manager not found' });
-
-//       isMatch = password === user.password; // Plaintext comparison
-//       if (!isMatch) return res.status(401).json({ message: 'Invalid credentials for manager' });
-//     } else if (uid) {
-//       // User Signin
-//       user = await User.findOne({ uid, role: ROLES.USER });
-//       if (!user) return res.status(404).json({ message: 'User not found' });
-
-//       isMatch = password === user.password; // Plaintext comparison
-//       if (!isMatch) return res.status(401).json({ message: 'Invalid credentials for user' });
-//     } else {
-//       return res.status(400).json({ message: 'Invalid login parameters' });
-//     }
-
-//     // Generate JWT
-//     const token = jwt.sign({ id: user._id, role: user.role }, SECRET_KEY, { expiresIn: '1h' });
-
-//     res.status(200).json({ token, role: user.role, message: 'Signin successful' });
-//   } catch (error) {
-//     res.status(500).json({ message: 'Error during signin', error: error.message });
-//   }
-// };
-
-
 export const signin = async (req, res) => {
   try {
     const { uid, password } = req.body;
