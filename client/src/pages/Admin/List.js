@@ -3,8 +3,8 @@
 // import { motion } from 'framer-motion';
 // import axios from 'axios';
 // import UserTable from './UserTable';
-// import Header from '../layout/Header';
 // import Footer from '../layout/Footer';
+// import Piechart from './Piechart';
 
 // const apiUrl = process.env.REACT_APP_BACKEND_URL;
 
@@ -57,13 +57,17 @@
 
 //   return (
 //     <div className="min-h-screen flex flex-col bg-gray-900 text-gray-100" style={{ paddingTop: '4rem' }}>
-//       <Header />
 //       <motion.div
 //         className="w-full px-6 py-6 flex-grow bg-gray-800 rounded-md shadow-lg"
 //         initial={{ opacity: 0 }}
 //         animate={{ opacity: 1 }}
 //         transition={{ duration: 1 }}
 //       >
+//         {/* Display Pie Chart */}
+//         <div className="mb-8">
+//           <Piechart users={users} />
+//         </div>
+
 //         <UserTable
 //           users={users}
 //           managers={managers}
@@ -79,26 +83,27 @@
 // export default List;
 
 
-
 import React, { useEffect, useState } from 'react';
 import { Button, message } from 'antd';
 import { motion } from 'framer-motion';
 import axios from 'axios';
 import UserTable from './UserTable';
-import Header from '../layout/Header';
 import Footer from '../layout/Footer';
-import Piechart from './Piechart'; // Import the PieChart Component
+import Piechart from './Piechart';
+import Filters from './Filters'; // Import the Filters component
 
 const apiUrl = process.env.REACT_APP_BACKEND_URL;
 
 const List = () => {
   const [users, setUsers] = useState([]);
+  const [filteredUsers, setFilteredUsers] = useState([]);
   const [managers, setManagers] = useState([]);
 
   const fetchUsers = async () => {
     try {
       const { data } = await axios.get(`${apiUrl}/api/users?role=user`);
       setUsers(data);
+      setFilteredUsers(data); // Initialize filtered users
     } catch (error) {
       message.error('Failed to fetch users');
     }
@@ -133,6 +138,45 @@ const List = () => {
     }
   };
 
+  const handleSearch = (query) => {
+    const filtered = users.filter((user) => {
+      // Convert all fields to lowercase for comparison
+      const queryLower = query.toLowerCase();
+  
+      return (
+        user.uid?.toLowerCase().includes(queryLower) ||
+        user.name?.toLowerCase().includes(queryLower) ||
+        user.email?.toLowerCase().includes(queryLower) ||
+        user.primaryContact?.toLowerCase().includes(queryLower) ||
+        user.managers?.some((manager) => manager.name?.toLowerCase().includes(queryLower)) ||
+        user.enrollmentIdAmazon?.toLowerCase().includes(queryLower) ||
+        user.enrollmentIdWebsite?.toLowerCase().includes(queryLower) ||
+        user.batchAmazon?.toLowerCase().includes(queryLower) ||
+        user.batchWebsite?.toLowerCase().includes(queryLower)
+      );
+    });
+  
+    setFilteredUsers(filtered);
+  };
+  
+  const handleEnrollmentFilter = (filter) => {
+    const filtered = users.filter((user) => {
+      if (filter === 'amazon') {
+        return user.enrollmentIdAmazon && !user.enrollmentIdWebsite;
+      }
+      if (filter === 'website') {
+        return user.enrollmentIdWebsite && !user.enrollmentIdAmazon;
+      }
+      if (filter === 'both') {
+        return user.enrollmentIdAmazon && user.enrollmentIdWebsite;
+      }
+      return true; // No filter applied
+    });
+  
+    setFilteredUsers(filtered);
+  };
+  
+
   useEffect(() => {
     fetchUsers();
     fetchManagers();
@@ -140,20 +184,27 @@ const List = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-900 text-gray-100" style={{ paddingTop: '4rem' }}>
-      <Header />
       <motion.div
         className="w-full px-6 py-6 flex-grow bg-gray-800 rounded-md shadow-lg"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 1 }}
       >
+        
+        {/* Filters Component */}
+        <Filters 
+  onSearch={handleSearch} 
+  onEnrollmentFilter={handleEnrollmentFilter} 
+/>
+
+
         {/* Display Pie Chart */}
         <div className="mb-8">
-          <Piechart users={users} />
+          <Piechart users={filteredUsers} />
         </div>
 
         <UserTable
-          users={users}
+          users={filteredUsers}
           managers={managers}
           handleDeleteUser={handleDeleteUser}
           handleAssignManagers={handleAssignManagers}

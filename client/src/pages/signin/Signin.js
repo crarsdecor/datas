@@ -337,7 +337,7 @@ const Signin = () => {
       
     </div>
     <footer className="absolute bottom-0 left-0 right-0 flex justify-center items-center py-4 bg-transparent text-gray-400 text-sm z-10">
-      <p>&copy; {new Date().getFullYear()} Data Crarts Decor. Powered by CreativeAvi.</p>
+      <p>&copy; {new Date().getFullYear()} Data Saumic Craft. Powered by CreativeAvi.</p>
     </footer>
     </>
   );
