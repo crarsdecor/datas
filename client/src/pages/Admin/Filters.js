@@ -21,7 +21,13 @@ const Filters = ({ onSearch, onFilter, onEnrollmentFilter }) => {
 
   const handleEnrollmentFilterChange = (value) => {
     setEnrollmentFilter(value);
-    onEnrollmentFilter(value);
+
+    if (value === "all") {
+      // Reset the enrollment filter if "All" is selected
+      onEnrollmentFilter(""); // Reset filter here
+    } else {
+      onEnrollmentFilter(value);
+    }
   };
 
   return (
@@ -40,11 +46,12 @@ const Filters = ({ onSearch, onFilter, onEnrollmentFilter }) => {
         placeholder="Filter by services"
         onChange={handleEnrollmentFilterChange}
         // value={enrollmentFilter}
+        value={enrollmentFilter || "all"}
         allowClear
-        value={enrollmentFilter || "both"}
         className="mb-4 md:mb-0 md:mr-4"
         style={{ width: "200px" }}
       >
+        <Option value="all">All</Option>
         <Option value="amazon">Amazon Only</Option>
         <Option value="website">Website Only</Option>
         <Option value="both">Amazon & Website</Option>
