@@ -1,13 +1,13 @@
-import React, { useState } from 'react';
-import { Input, Select, Button } from 'antd';
+import React, { useState } from "react";
+import { Input, Select, Button } from "antd";
 
 const { Search } = Input;
 const { Option } = Select;
 
 const Filters = ({ onSearch, onFilter, onEnrollmentFilter }) => {
-  const [roleFilter, setRoleFilter] = useState('');
-  const [enrollmentFilter, setEnrollmentFilter] = useState('');
-  const [searchQuery, setSearchQuery] = useState('');
+  const [roleFilter, setRoleFilter] = useState("");
+  const [enrollmentFilter, setEnrollmentFilter] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
 
   const handleSearch = (value) => {
     setSearchQuery(value);
@@ -32,24 +32,23 @@ const Filters = ({ onSearch, onFilter, onEnrollmentFilter }) => {
         onSearch={handleSearch}
         allowClear
         className="mb-4 md:mb-0 md:mr-4"
-        style={{ width: '100%', maxWidth: '300px' }}
+        style={{ width: "100%", maxWidth: "300px" }}
       />
-
 
       {/* Enrollment ID Filter */}
       <Select
-        placeholder="Filter by enrollment ID"
+        placeholder="Filter by services"
         onChange={handleEnrollmentFilterChange}
-        value={enrollmentFilter}
+        // value={enrollmentFilter}
         allowClear
+        value={enrollmentFilter || "both"}
         className="mb-4 md:mb-0 md:mr-4"
-        style={{ width: '200px' }}
+        style={{ width: "200px" }}
       >
         <Option value="amazon">Amazon Only</Option>
         <Option value="website">Website Only</Option>
-        <Option value="both">Both</Option>
+        <Option value="both">Amazon & Website</Option>
       </Select>
-
     </div>
   );
 };
