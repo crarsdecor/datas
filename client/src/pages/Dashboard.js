@@ -69,7 +69,7 @@ const UserTab = () => {
 
   const handleDownloadSample = () => {
     const csvContent = `Enrollment ID,Date,Name,Email,Primary Contact,Secondary Contact,Manager UIDs,Batch
-BZ3124,01-14-2025,Faiz Ahmad,faizahmad@example.com,9876543210,1234567890,TL2,140125
+AZ10,01-14-2025,Faiz Ahmad,faizahmad@example.com,+918409669330,+919402011786,TL2,140125
 `;
 
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
