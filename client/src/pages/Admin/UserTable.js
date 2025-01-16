@@ -109,6 +109,7 @@ const UserTable = ({
 }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
+  console.log(users);
 
   const showModal = (user) => {
     setSelectedUser(user);

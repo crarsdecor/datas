@@ -68,12 +68,23 @@ const UserTab = () => {
   };
 
   const handleDownloadSample = () => {
+    const csvContent = `Enrollment ID,Date,Name,Email,Primary Contact,Secondary Contact,Manager UIDs,Batch
+BZ3124,01-14-2025,Faiz Ahmad,faizahmad@example.com,9876543210,1234567890,TL2,140125
+`;
+
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+
     const link = document.createElement("a");
-    link.href = "/Sample.csv"; // Replace with the correct path to your local file
+    const url = URL.createObjectURL(blob);
+    link.href = url;
     link.download = "Sample.csv";
+
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+
+    // Clean up the URL object
+    URL.revokeObjectURL(url);
   };
 
   const handleLogout = () => {
