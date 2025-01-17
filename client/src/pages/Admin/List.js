@@ -105,7 +105,7 @@ const List = () => {
       style={{ paddingTop: "4rem" }}
     >
       <motion.div
-        className="w-full px-6 py-6 flex-grow bg-gray-800 rounded-md shadow-lg"
+        className="w-full px-2 py-2 flex-grow bg-white rounded-md shadow-lg"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 1 }}
@@ -121,7 +121,7 @@ const List = () => {
           <Piechart users={filteredUsers} />
         </div>
         <div className="flex justify-end items-center mt-8">
-          <h2 className="text-2xl font-semibold text-white">
+          <h2 className="text-2xl font-semibold text-black">
             Total Users:
             <span className="text-3xl ml-4 font-bold text-blue-500 animate-pulse glow">
               {filteredUsers.length}

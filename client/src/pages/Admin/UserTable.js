@@ -152,7 +152,7 @@ const UserTable = ({
     { title: "Enrollment ID WEBSITE", dataIndex: "enrollmentIdWebsite" },
     { title: "Batch (WEBSITE)", dataIndex: "batchWebsite" },
     { title: "Batch (AMAZON)", dataIndex: "batchAmazon" },
-    { title: "Name", dataIndex: "name" },
+    { title: "Name", width: 180, dataIndex: "name" },
     { title: "Email", dataIndex: "email" },
     { title: "Primary Contact", dataIndex: "primaryContact" },
     { title: "Secondary Contact", dataIndex: "secondaryContact" },
@@ -210,7 +210,7 @@ const UserTable = ({
         dataSource={users}
         rowKey="_id"
         columns={columns}
-        scroll={{ x: 1200 }} // Enable horizontal scrolling for responsiveness
+        scroll={{ x: 1800 }} // Enable horizontal scrolling for responsiveness
         bordered
         pagination={{ pageSize: 100 }}
       />
