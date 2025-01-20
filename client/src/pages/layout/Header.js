@@ -7,7 +7,7 @@ const Header = ({ onLogout }) => {
   return (
     <header className="fixed top-0 left-0 right-0 z-50 flex items-center mb-4 justify-between px-6 py-4 text-white">
       {/* Heading */}
-      <h1 className="text-2xl font-semibold">Data Crarts Decor</h1>
+      <h1 className="text-2xl font-semibold">Data's Saumic Craft</h1>
 
       {/* Right-side Button */}
       <Menu as="div" className="relative inline-block text-left">

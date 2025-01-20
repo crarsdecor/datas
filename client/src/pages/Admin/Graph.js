@@ -123,7 +123,7 @@ const Graph = ({ users }) => {
           />
           <defs>
             <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#4CAF50" stopOpacity={0.8} />
+              <stop offset="0%" stopColor="#0000FF" stopOpacity={0.8} />
               <stop offset="100%" stopColor="#087F23" stopOpacity={0.8} />
             </linearGradient>
           </defs>

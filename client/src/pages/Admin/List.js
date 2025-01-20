@@ -120,14 +120,7 @@ const List = () => {
         <div className="mb-8">
           <Piechart users={filteredUsers} />
         </div>
-        <div className="flex justify-end items-center mt-8">
-          <h2 className="text-2xl font-semibold text-black">
-            Total Users:
-            <span className="text-3xl ml-4 font-bold text-blue-500 animate-pulse glow">
-              {filteredUsers.length}
-            </span>
-          </h2>
-        </div>
+        
         <UserTable
           users={filteredUsers}
           managers={managers}
