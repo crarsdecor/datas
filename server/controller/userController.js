@@ -1,5 +1,4 @@
-import { User, ROLES } from '../model/userModel.js';
-
+import { User, ROLES } from "../model/userModel.js";
 
 // export const createUser = async (req, res) => {
 //   try {
@@ -110,8 +109,6 @@ export const createUser = async (req, res) => {
   }
 };
 
-
-
 // Get all users or filter by role
 // export const getUsers = async (req, res) => {
 //   try {
@@ -124,7 +121,6 @@ export const createUser = async (req, res) => {
 //     res.status(500).json({ message: error.message });
 //   }
 // };
-
 
 export const getUsers = async (req, res) => {
   try {
@@ -150,38 +146,56 @@ export const getUsers = async (req, res) => {
 // Update user (assign/unassign managers)
 
 export const updateUser = async (req, res) => {
-  try {
-    const { userId } = req.params;
-    const updates = req.body; // Get all fields to update from the request body
+  const { uid } = req.params; // Extract user ID from URL
+  console.log("User ID to update:", uid);
 
-    const user = await User.findById(userId);
+  // Validate if the UID is provided
+  if (!uid) {
+    return res.status(400).json({ message: "UID is required" });
+  }
+
+  const {
+    name,
+    email,
+    primaryContact,
+    batchAmazon,
+    batchWebsite,
+    enrollmentIdAmazon,
+    enrollmentIdWebsite,
+  } = req.body;
+
+  // Validate if required fields are present
+  if (!name || !email) {
+    return res.status(400).json({ message: "Name and Email are required" });
+  }
+
+  try {
+    // Find the user by UID and update their data
+    const user = await User.findOneAndUpdate(
+      { uid }, // Find user by UID
+      {
+        name,
+        email,
+        primaryContact,
+        batchAmazon,
+        batchWebsite,
+        enrollmentIdAmazon,
+        enrollmentIdWebsite,
+      },
+      { new: true } // Return the updated document
+    );
+
+    // If user not found, return error
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    if (updates.managerIds) {
-      // Validate all provided manager IDs
-      const managers = await User.find({
-        _id: { $in: updates.managerIds },
-        role: ROLES.MANAGER,
-      });
-      if (managers.length !== updates.managerIds.length) {
-        return res
-          .status(400)
-          .json({ message: "One or more managers not found or invalid" });
-      }
-      updates.managers = updates.managerIds; // Ensure the correct field is updated
-      delete updates.managerIds; // Remove from updates to avoid overriding unintentionally
-    }
-
-    // Update user with the provided fields
-    Object.assign(user, updates);
-
-    await user.save();
-
-    res.status(200).json({ message: "User updated successfully", user });
+    // Send response with updated user data
+    res.status(200).json(user);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    // Log the error and send a response
+    console.error("Error updating user:", error);
+    res.status(500).json({ message: "Server error. Please try again later." });
   }
 };
 
@@ -203,15 +217,13 @@ export const deleteUser = async (req, res) => {
   }
 };
 
-
-
 // Get a user by ID to check service type (Amazon or Website)
 export const getUserById = async (req, res) => {
   try {
     const { userId } = req.params; // Extract userId from request parameters
 
     // Find user by ObjectId
-    const user = await User.findById(userId).populate('managers', 'name email'); // Populate managers if needed
+    const user = await User.findById(userId).populate("managers", "name email"); // Populate managers if needed
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });

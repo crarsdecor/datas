@@ -43,6 +43,34 @@ const List = () => {
       message.error("Failed to delete user");
     }
   };
+  const handleUpdateUser = async (editUserData) => {
+    console.log(editUserData.uid);
+    try {
+      // Make the API call to update the user data
+      const response = await axios.put(
+        `${apiUrl}/api/users/${editUserData.uid}`,
+        {
+          name: editUserData.name,
+          email: editUserData.email,
+          primaryContact: editUserData.primaryContact,
+          batchAmazon: editUserData.batchAmazon,
+          batchWebsite: editUserData.batchWebsite,
+          enrollmentIdAmazon: editUserData.enrollmentIdAmazon,
+          enrollmentIdWebsite: editUserData.enrollmentIdWebsite,
+        }
+      );
+
+      if (response.status === 200) {
+        message.success("User updated successfully!");
+        window.location.reload();
+      } else {
+        message.error("Failed to update user. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error updating user:", error);
+      message.error("Failed to update user. Please try again.");
+    }
+  };
 
   const handleAssignManagers = async (userId, managerIds) => {
     try {
@@ -120,12 +148,13 @@ const List = () => {
         <div className="mb-8">
           <Piechart users={filteredUsers} />
         </div>
-        
+
         <UserTable
           users={filteredUsers}
           managers={managers}
           handleDeleteUser={handleDeleteUser}
           handleAssignManagers={handleAssignManagers}
+          handleUpdateUser={handleUpdateUser}
         />
       </motion.div>
       <Footer />

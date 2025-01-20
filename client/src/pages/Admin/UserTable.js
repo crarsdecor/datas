@@ -1,5 +1,14 @@
 import React, { useState } from "react";
-import { Table, Button, Select, Popconfirm, Tag, Modal, Radio } from "antd";
+import {
+  Table,
+  Button,
+  Select,
+  Popconfirm,
+  Tag,
+  Modal,
+  Radio,
+  Input,
+} from "antd";
 import moment from "moment";
 
 const { Option } = Select;
@@ -9,10 +18,13 @@ const UserTable = ({
   managers,
   handleDeleteUser,
   handleAssignManagers,
+  handleUpdateUser, // Function to handle update user data
 }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isEditModalVisible, setIsEditModalVisible] = useState(false); // Modal state for editing
   const [selectedUser, setSelectedUser] = useState(null);
   const [filterOption, setFilterOption] = useState("all");
+  const [editUserData, setEditUserData] = useState({});
 
   const showModal = (user) => {
     setSelectedUser(user);
@@ -26,6 +38,17 @@ const UserTable = ({
 
   const handleFilterChange = (e) => {
     setFilterOption(e.target.value);
+  };
+
+  const handleEditClick = (user) => {
+    setEditUserData({ ...user });
+    setIsEditModalVisible(true);
+  };
+
+  const handleEditSubmit = () => {
+    // Send updated user data to the backend using the handleUpdateUser function
+    handleUpdateUser(editUserData);
+    setIsEditModalVisible(false);
   };
 
   // Filter users based on selected filter option
@@ -115,14 +138,22 @@ const UserTable = ({
     {
       title: "Actions",
       render: (_, record) => (
-        <Popconfirm
-          title="Are you sure to delete this user?"
-          onConfirm={() => handleDeleteUser(record._id)}
-          okText="Yes"
-          cancelText="No"
-        >
-          <Button danger>Delete</Button>
-        </Popconfirm>
+        <>
+          <Button
+            onClick={() => handleEditClick(record)} // Add Edit button
+            style={{ marginRight: 8 }}
+          >
+            Edit
+          </Button>
+          <Popconfirm
+            title="Are you sure to delete this user?"
+            onConfirm={() => handleDeleteUser(record._id)}
+            okText="Yes"
+            cancelText="No"
+          >
+            <Button danger>Delete</Button>
+          </Popconfirm>
+        </>
       ),
     },
   ];
@@ -194,6 +225,139 @@ const UserTable = ({
             </tbody>
           </table>
         )}
+      </Modal>
+
+      {/* Edit Modal */}
+      <Modal
+        title="Edit User"
+        visible={isEditModalVisible}
+        onCancel={() => setIsEditModalVisible(false)}
+        onOk={handleEditSubmit}
+        okText="Save"
+        cancelText="Cancel"
+        className="modal-custom" // Custom class for the modal
+      >
+        <div className="space-y-4">
+          {/* Name Input */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Name
+            </label>
+            <Input
+              className="mt-1 p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              placeholder="Name"
+              value={editUserData.name}
+              onChange={(e) =>
+                setEditUserData({ ...editUserData, name: e.target.value })
+              }
+            />
+          </div>
+
+          {/* Email Input */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Email
+            </label>
+            <Input
+              className="mt-1 p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              placeholder="Email"
+              value={editUserData.email}
+              onChange={(e) =>
+                setEditUserData({ ...editUserData, email: e.target.value })
+              }
+            />
+          </div>
+
+          {/* Primary Contact Input */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Primary Contact
+            </label>
+            <Input
+              className="mt-1 p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              placeholder="Primary Contact"
+              value={editUserData.primaryContact}
+              onChange={(e) =>
+                setEditUserData({
+                  ...editUserData,
+                  primaryContact: e.target.value,
+                })
+              }
+            />
+          </div>
+
+          {/* Batch (AMAZON) Input */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Batch (AMAZON)
+            </label>
+            <Input
+              className="mt-1 p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              placeholder="Batch (AMAZON)"
+              value={editUserData.batchAmazon}
+              onChange={(e) =>
+                setEditUserData({
+                  ...editUserData,
+                  batchAmazon: e.target.value,
+                })
+              }
+            />
+          </div>
+
+          {/* Batch (WEBSITE) Input */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Batch (WEBSITE)
+            </label>
+            <Input
+              className="mt-1 p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              placeholder="Batch (WEBSITE)"
+              value={editUserData.batchWebsite}
+              onChange={(e) =>
+                setEditUserData({
+                  ...editUserData,
+                  batchWebsite: e.target.value,
+                })
+              }
+            />
+          </div>
+
+          {/* Enrollment ID (AMAZON) Input */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Enrollment ID (AMAZON)
+            </label>
+            <Input
+              className="mt-1 p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              placeholder="Enrollment ID (AMAZON)"
+              value={editUserData.enrollmentIdAmazon}
+              onChange={(e) =>
+                setEditUserData({
+                  ...editUserData,
+                  enrollmentIdAmazon: e.target.value,
+                })
+              }
+            />
+          </div>
+
+          {/* Enrollment ID (WEBSITE) Input */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Enrollment ID (WEBSITE)
+            </label>
+            <Input
+              className="mt-1 p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              placeholder="Enrollment ID (WEBSITE)"
+              value={editUserData.enrollmentIdWebsite}
+              onChange={(e) =>
+                setEditUserData({
+                  ...editUserData,
+                  enrollmentIdWebsite: e.target.value,
+                })
+              }
+            />
+          </div>
+        </div>
       </Modal>
     </>
   );
