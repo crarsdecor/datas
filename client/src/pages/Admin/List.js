@@ -74,7 +74,10 @@ const List = () => {
 
   const handleAssignManagers = async (userId, managerIds) => {
     try {
-      await axios.put(`${apiUrl}/api/users/${userId}`, { managerIds });
+      await axios.put(`${apiUrl}/api/users/asmanager/${userId}`, {
+        managerIds,
+      });
+      console.log(userId);
       message.success("Managers assigned successfully");
       fetchUsers();
     } catch (error) {

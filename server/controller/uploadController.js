@@ -161,7 +161,6 @@
 //       fs.unlinkSync(req.file.path);
 //     });
 // };
-
 import { User, ROLES } from "../model/userModel.js";
 import csv from "csv-parser";
 import fs from "fs";
@@ -181,7 +180,9 @@ export const uploadContacts = (req, res) => {
         email: data["Email"],
         primaryContact: data["Primary Contact"],
         secondaryContact: data["Secondary Contact"],
-        managerUids: data["Manager UIDs"] ? data["Manager UIDs"].split(",") : [],
+        managerUids: data["Manager UIDs"]
+          ? data["Manager UIDs"].split(",")
+          : [],
         batch: data["Batch"],
       };
 
@@ -204,7 +205,9 @@ export const uploadContacts = (req, res) => {
         const uniqueResults = [];
         const uids = new Map();
 
-        const primaryContacts = results.map((contact) => contact.primaryContact);
+        const primaryContacts = results.map(
+          (contact) => contact.primaryContact
+        );
 
         const [existingContacts, managers] = await Promise.all([
           User.find({ primaryContact: { $in: primaryContacts } }),
@@ -218,10 +221,16 @@ export const uploadContacts = (req, res) => {
           managers.map((manager) => [manager.uid, manager._id])
         );
 
-        const latestContact = await User.findOne({}).sort({ uid: -1 }) || { uid: "UID0" };
-        let nextUidNumber = latestContact.uid
-          ? parseInt(latestContact.uid.replace("UID", "")) + 1
-          : 1;
+        // Get the latest used UID from the database
+        const latestContact = (await User.findOne({}).sort({ uid: -1 })) || {
+          uid: "UID00001",
+        };
+
+        // Extract numeric part of the latest UID and increment it
+        let nextUidNumber = parseInt(latestContact.uid.replace("UID", "")) + 1;
+
+        // Ensure the UID number part is padded to 5 digits
+        const padUidNumber = (num) => String(num).padStart(5, "0");
 
         for (const contact of results) {
           const existingContact = contactMap.get(contact.primaryContact);
@@ -242,7 +251,8 @@ export const uploadContacts = (req, res) => {
           } else if (existingContact?.uid) {
             uid = existingContact.uid;
           } else {
-            uid = `UID${nextUidNumber++}`;
+            // Generate UID and pad the numeric part to 5 digits
+            uid = `UID${padUidNumber(nextUidNumber++)}`;
             uids.set(contact.primaryContact, uid);
           }
 
@@ -252,7 +262,9 @@ export const uploadContacts = (req, res) => {
               existingContact?.enrollmentIdAmazon === contact.enrollmentId &&
               existingContact?.batchAmazon === contact.batch &&
               existingContact?.dateAmazon &&
-              new Date(existingContact.dateAmazon).toISOString().slice(0, 10) === contact.date
+              new Date(existingContact.dateAmazon)
+                .toISOString()
+                .slice(0, 10) === contact.date
             ) {
               skippedEntriesCount++;
               skippedEntries[contact.enrollmentId] = "Duplicate Amazon entry";
@@ -268,7 +280,9 @@ export const uploadContacts = (req, res) => {
               existingContact?.enrollmentIdWebsite === contact.enrollmentId &&
               existingContact?.batchWebsite === contact.batch &&
               existingContact?.dateWebsite &&
-              new Date(existingContact.dateWebsite).toISOString().slice(0, 10) === contact.date
+              new Date(existingContact.dateWebsite)
+                .toISOString()
+                .slice(0, 10) === contact.date
             ) {
               skippedEntriesCount++;
               skippedEntries[contact.enrollmentId] = "Duplicate Website entry";
@@ -281,12 +295,14 @@ export const uploadContacts = (req, res) => {
             };
           } else {
             skippedEntriesCount++;
-            skippedEntries[contact.enrollmentId] = "Unknown enrollment ID prefix";
+            skippedEntries[contact.enrollmentId] =
+              "Unknown enrollment ID prefix";
             continue;
           }
 
-          const password = `${uid}@${contact.name.slice(0, 2).toUpperCase()}@${contact.primaryContact.slice(-2)}`;
-
+          const password = `${uid}@${contact.name
+            .slice(0, 2)
+            .toUpperCase()}@${contact.primaryContact.slice(-2)}`;
 
           const contactData = {
             ...contact,
@@ -310,9 +326,15 @@ export const uploadContacts = (req, res) => {
 
         if (uniqueResults.length > 0) {
           const contacts = await User.insertMany(uniqueResults);
-          res.status(200).json({ contacts, skippedEntriesCount, skippedEntries });
+          res
+            .status(200)
+            .json({ contacts, skippedEntriesCount, skippedEntries });
         } else {
-          res.status(200).json({ message: "No new contacts added.", skippedEntriesCount, skippedEntries });
+          res.status(200).json({
+            message: "No new contacts added.",
+            skippedEntriesCount,
+            skippedEntries,
+          });
         }
       } catch (error) {
         console.error("Error inserting contacts:", error);

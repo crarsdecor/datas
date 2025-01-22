@@ -144,6 +144,62 @@ export const getUsers = async (req, res) => {
 };
 
 // Update user (assign/unassign managers)
+export const assignManager = async (req, res) => {
+  const { userId } = req.params; // Use 'userId' to match the route parameter
+  const { managerIds } = req.body; // Extract manager IDs from the request body
+
+  // Validate inputs
+  if (!userId) {
+    return res.status(400).json({ message: "User ID is required." });
+  }
+  const user = await User.find({ uid: userId });
+  console.log(user);
+
+  if (!Array.isArray(managerIds) || managerIds.length === 0) {
+    return res
+      .status(400)
+      .json({ message: "Manager IDs are required and should be an array." });
+  }
+
+  try {
+    // Fetch the manager users to validate the provided IDs
+    const managers = await User.find({
+      uid: { $in: managerIds },
+      role: ROLES.MANAGER, // Ensure only valid manager roles are included
+    });
+
+    // If no valid managers are found, return an error
+    if (managers.length === 0) {
+      return res
+        .status(400)
+        .json({ message: "No valid managers found with the provided IDs." });
+    }
+
+    // Extract manager IDs from the documents
+    const managerObjectIds = managers.map((manager) => manager._id);
+
+    // Update the user's managers field
+    const updatedUser = await User.findOneAndUpdate(
+      { uid: userId }, // Use 'userId' for querying the user
+      { $addToSet: { managers: { $each: managerObjectIds } } }, // Add managers without duplication
+      { new: true } // Return the updated user document
+    );
+
+    // If the user is not found, return a 404 error
+    if (!updatedUser) {
+      return res.status(404).json({ message: "User not found." });
+    }
+
+    // Respond with the updated user
+    res
+      .status(200)
+      .json({ message: "Managers assigned successfully.", user: updatedUser });
+  } catch (error) {
+    // Handle server errors
+    console.error("Error assigning managers:", error);
+    res.status(500).json({ message: "Server error. Please try again later." });
+  }
+};
 
 export const updateUser = async (req, res) => {
   const { uid } = req.params; // Extract user ID from URL
