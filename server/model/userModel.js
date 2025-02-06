@@ -9,6 +9,7 @@ export const ROLES = {
   SUPERVISOR: "supervisor",
   ACCOUNTANT: "accountant",
   TELESALES: "telesales",
+  DISPATCH: "dispatch",
 };
 
 const paymentStageSchema = new mongoose.Schema({

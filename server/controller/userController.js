@@ -152,8 +152,8 @@ export const assignManager = async (req, res) => {
   if (!userId) {
     return res.status(400).json({ message: "User ID is required." });
   }
-  const user = await User.find({ uid: userId });
-  console.log(user);
+  const user = await User.find({ _id: userId });
+  // console.log(user);
 
   if (!Array.isArray(managerIds) || managerIds.length === 0) {
     return res
@@ -164,7 +164,7 @@ export const assignManager = async (req, res) => {
   try {
     // Fetch the manager users to validate the provided IDs
     const managers = await User.find({
-      uid: { $in: managerIds },
+      _id: managerIds,
       role: ROLES.MANAGER, // Ensure only valid manager roles are included
     });
 
@@ -180,7 +180,7 @@ export const assignManager = async (req, res) => {
 
     // Update the user's managers field
     const updatedUser = await User.findOneAndUpdate(
-      { uid: userId }, // Use 'userId' for querying the user
+      { _id: userId }, // Use 'userId' for querying the user
       { $addToSet: { managers: { $each: managerObjectIds } } }, // Add managers without duplication
       { new: true } // Return the updated user document
     );

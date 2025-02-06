@@ -5,21 +5,21 @@ import axios from "axios";
 import UserTable from "./UserTable";
 import Footer from "../layout/Footer";
 import Piechart from "./Piechart";
-import Filters from "./Filters"; // Import the Filters component
+import Filters from "./Filters";
 
 const apiUrl = process.env.REACT_APP_BACKEND_URL;
 
 const List = () => {
   const [users, setUsers] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([]);
-  console.log(filteredUsers.length);
   const [managers, setManagers] = useState([]);
+  const [filterRange, setFilterRange] = useState("all");
 
   const fetchUsers = async () => {
     try {
       const { data } = await axios.get(`${apiUrl}/api/users?role=user`);
       setUsers(data);
-      setFilteredUsers(data); // Initialize filtered users
+      setFilteredUsers(data);
     } catch (error) {
       message.error("Failed to fetch users");
     }
@@ -43,10 +43,9 @@ const List = () => {
       message.error("Failed to delete user");
     }
   };
+
   const handleUpdateUser = async (editUserData) => {
-    console.log(editUserData.uid);
     try {
-      // Make the API call to update the user data
       const response = await axios.put(
         `${apiUrl}/api/users/${editUserData.uid}`,
         {
@@ -67,7 +66,6 @@ const List = () => {
         message.error("Failed to update user. Please try again.");
       }
     } catch (error) {
-      console.error("Error updating user:", error);
       message.error("Failed to update user. Please try again.");
     }
   };
@@ -77,7 +75,6 @@ const List = () => {
       await axios.put(`${apiUrl}/api/users/asmanager/${userId}`, {
         managerIds,
       });
-      console.log(userId);
       message.success("Managers assigned successfully");
       fetchUsers();
     } catch (error) {
@@ -87,9 +84,7 @@ const List = () => {
 
   const handleSearch = (query) => {
     const filtered = users.filter((user) => {
-      // Convert all fields to lowercase for comparison
       const queryLower = query.toLowerCase();
-
       return (
         user.uid?.toLowerCase().includes(queryLower) ||
         user.name?.toLowerCase().includes(queryLower) ||
@@ -104,7 +99,6 @@ const List = () => {
         user.batchWebsite?.toLowerCase().includes(queryLower)
       );
     });
-
     setFilteredUsers(filtered);
   };
 
@@ -119,16 +113,63 @@ const List = () => {
       if (filter === "both") {
         return user.enrollmentIdAmazon && user.enrollmentIdWebsite;
       }
-      return true; // No filter applied
+      return true;
     });
-
     setFilteredUsers(filtered);
+  };
+
+  const filterUsersByDate = (users, range) => {
+    const now = new Date();
+    let startDate;
+    switch (range) {
+      case "today":
+        startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        break;
+      case "last7days":
+        startDate = new Date(new Date().setDate(now.getDate() - 7));
+        break;
+      case "thisMonth":
+        startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+        break;
+      case "last30days":
+        startDate = new Date(new Date().setDate(now.getDate() - 30));
+        break;
+      case "lastMonth": {
+        const previousMonth = new Date(
+          now.getFullYear(),
+          now.getMonth() - 1,
+          1
+        );
+        const endDate = new Date(now.getFullYear(), now.getMonth(), 0);
+        return users.filter(
+          (user) =>
+            user.createdAt &&
+            new Date(user.createdAt) >= previousMonth &&
+            new Date(user.createdAt) <= endDate
+        );
+      }
+      case "last6months":
+        startDate = new Date(now.getFullYear(), now.getMonth() - 6, 1);
+        break;
+      case "thisYear":
+        startDate = new Date(now.getFullYear(), 0, 1);
+        break;
+      default:
+        return users;
+    }
+    return users.filter(
+      (user) => user.createdAt && new Date(user.createdAt) >= startDate
+    );
   };
 
   useEffect(() => {
     fetchUsers();
     fetchManagers();
   }, []);
+
+  useEffect(() => {
+    setFilteredUsers(filterUsersByDate(users, filterRange));
+  }, [filterRange, users]);
 
   return (
     <div
@@ -141,17 +182,29 @@ const List = () => {
         animate={{ opacity: 1 }}
         transition={{ duration: 1 }}
       >
-        {/* Filters Component */}
         <Filters
           onSearch={handleSearch}
           onEnrollmentFilter={handleEnrollmentFilter}
         />
-
-        {/* Display Pie Chart */}
         <div className="mb-8">
           <Piechart users={filteredUsers} />
         </div>
-
+        <div className="text-center">
+          <select
+            className="p-2 bg-gray-700 text-gray-100 rounded"
+            value={filterRange}
+            onChange={(e) => setFilterRange(e.target.value)}
+          >
+            <option value="all">All Time</option>
+            <option value="today">Today</option>
+            <option value="last7days">Last 7 Days</option>
+            <option value="thisMonth">This Month</option>
+            <option value="last30days">Last 30 Days</option>
+            <option value="lastMonth">Previous Month</option>
+            <option value="last6months">Last 6 Months</option>
+            <option value="thisYear">This Year</option>
+          </select>
+        </div>
         <UserTable
           users={filteredUsers}
           managers={managers}
