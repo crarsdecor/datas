@@ -107,6 +107,13 @@ const UserTable = ({
     { title: "Password", dataIndex: "password" },
     {
       title: "Assigned Managers",
+      dataIndex: "managers",
+      filters: managers.map((manager) => ({
+        text: manager.name,
+        value: manager._id,
+      })),
+      onFilter: (value, record) =>
+        record.managers?.some((manager) => manager._id === value),
       render: (_, record) =>
         record.managers && record.managers.length > 0 ? (
           record.managers.map((manager) => (
@@ -141,7 +148,7 @@ const UserTable = ({
       render: (_, record) => (
         <>
           <Button
-            onClick={() => handleEditClick(record)} // Add Edit button
+            onClick={() => handleEditClick(record)}
             style={{ marginRight: 8 }}
           >
             Edit
@@ -158,6 +165,7 @@ const UserTable = ({
       ),
     },
   ];
+
   const csvData = filteredUsers.map((user) => ({
     UID: user.uid,
     Name: user.name,
