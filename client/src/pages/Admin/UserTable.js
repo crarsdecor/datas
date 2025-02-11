@@ -10,6 +10,7 @@ import {
   Input,
 } from "antd";
 import moment from "moment";
+import { CSVLink } from "react-csv";
 
 const { Option } = Select;
 
@@ -157,6 +158,22 @@ const UserTable = ({
       ),
     },
   ];
+  const csvData = filteredUsers.map((user) => ({
+    UID: user.uid,
+    Name: user.name,
+    Email: user.email,
+    "Primary Contact": user.primaryContact,
+    "Enrollment ID Amazon": user.enrollmentIdAmazon || "N/A",
+    "Enrollment ID Website": user.enrollmentIdWebsite || "N/A",
+    "Batch Amazon": user.batchAmazon || "N/A",
+    "Batch Website": user.batchWebsite || "N/A",
+    "Date Amazon": user.dateAmazon
+      ? moment(user.dateAmazon).format("DD-MM-YYYY")
+      : "N/A",
+    "Date Website": user.dateWebsite
+      ? moment(user.dateWebsite).format("DD-MM-YYYY")
+      : "N/A",
+  }));
 
   return (
     <>
@@ -173,6 +190,9 @@ const UserTable = ({
           <Radio.Button value="websiteOnly">Website Only</Radio.Button>
           <Radio.Button value="amazonWebsite">Amazon & Website</Radio.Button>
         </Radio.Group>
+        <CSVLink data={csvData} filename="filtered_users.csv">
+          <Button type="primary">Download CSV</Button>
+        </CSVLink>
         <div className="flex justify-center items-center">
           <h2 className="text-2xl font-semibold text-black">
             Total Users:

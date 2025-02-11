@@ -182,13 +182,6 @@ const List = () => {
         animate={{ opacity: 1 }}
         transition={{ duration: 1 }}
       >
-        <Filters
-          onSearch={handleSearch}
-          onEnrollmentFilter={handleEnrollmentFilter}
-        />
-        <div className="mb-8">
-          <Piechart users={filteredUsers} />
-        </div>
         <div className="text-center">
           <select
             className="p-2 bg-gray-700 text-gray-100 rounded"
@@ -205,6 +198,14 @@ const List = () => {
             <option value="thisYear">This Year</option>
           </select>
         </div>
+        <Filters
+          onSearch={handleSearch}
+          onEnrollmentFilter={handleEnrollmentFilter}
+        />
+        <div className="mb-8">
+          <Piechart users={filteredUsers} />
+        </div>
+
         <UserTable
           users={filteredUsers}
           managers={managers}
