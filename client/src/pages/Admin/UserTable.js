@@ -19,13 +19,17 @@ const UserTable = ({
   managers,
   handleDeleteUser,
   handleAssignManagers,
-  handleUpdateUser, // Function to handle update user data
+  handleUpdateUser,
 }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [isEditModalVisible, setIsEditModalVisible] = useState(false); // Modal state for editing
+  const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [filterOption, setFilterOption] = useState("all");
+  const [selectedManager, setSelectedManager] = useState(null);
   const [editUserData, setEditUserData] = useState({});
+  const handleManagerFilterChange = (value) => {
+    setSelectedManager(value);
+  };
 
   const showModal = (user) => {
     setSelectedUser(user);
@@ -52,22 +56,35 @@ const UserTable = ({
     setIsEditModalVisible(false);
   };
 
-  // Filter users based on selected filter option
   const filteredUsers = users.filter((user) => {
+    let passesFilter = true;
+
     switch (filterOption) {
       case "amazon":
-        return user.enrollmentIdAmazon;
+        passesFilter = user.enrollmentIdAmazon;
+        break;
       case "website":
-        return user.enrollmentIdWebsite;
+        passesFilter = user.enrollmentIdWebsite;
+        break;
       case "amazonOnly":
-        return user.enrollmentIdAmazon && !user.enrollmentIdWebsite;
+        passesFilter = user.enrollmentIdAmazon && !user.enrollmentIdWebsite;
+        break;
       case "websiteOnly":
-        return !user.enrollmentIdAmazon && user.enrollmentIdWebsite;
+        passesFilter = !user.enrollmentIdAmazon && user.enrollmentIdWebsite;
+        break;
       case "amazonWebsite":
-        return user.enrollmentIdAmazon && user.enrollmentIdWebsite;
+        passesFilter = user.enrollmentIdAmazon && user.enrollmentIdWebsite;
+        break;
       default:
-        return true; // Show all users
+        passesFilter = true;
     }
+
+    if (selectedManager) {
+      passesFilter =
+        passesFilter && user.managers?.some((m) => m._id === selectedManager);
+    }
+
+    return passesFilter;
   });
 
   const columns = [
@@ -171,6 +188,8 @@ const UserTable = ({
     Name: user.name,
     Email: user.email,
     "Primary Contact": user.primaryContact,
+    "Manager Name":
+      user.managers?.map((manager) => manager.name).join(", ") || "N/A",
     "Enrollment ID Amazon": user.enrollmentIdAmazon || "N/A",
     "Enrollment ID Website": user.enrollmentIdWebsite || "N/A",
     "Batch Amazon": user.batchAmazon || "N/A",
@@ -198,6 +217,18 @@ const UserTable = ({
           <Radio.Button value="websiteOnly">Website Only</Radio.Button>
           <Radio.Button value="amazonWebsite">Amazon & Website</Radio.Button>
         </Radio.Group>
+        <Select
+          placeholder="Filter by Manager"
+          allowClear
+          onChange={handleManagerFilterChange}
+          style={{ width: 200 }}
+        >
+          {managers.map((manager) => (
+            <Option key={manager._id} value={manager._id}>
+              {manager.name}
+            </Option>
+          ))}
+        </Select>
         <CSVLink data={csvData} filename="filtered_users.csv">
           <Button type="primary">Download CSV</Button>
         </CSVLink>
@@ -216,7 +247,7 @@ const UserTable = ({
         dataSource={filteredUsers}
         rowKey="_id"
         columns={columns}
-        scroll={{ x: 1800 }} // Enable horizontal scrolling for responsiveness
+        scroll={{ x: 1800 }}
         bordered
         pagination={{ pageSize: 100 }}
       />
