@@ -121,6 +121,7 @@ const List = () => {
   const filterUsersByDate = (users, range) => {
     const now = new Date();
     let startDate;
+
     switch (range) {
       case "today":
         startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -141,12 +142,18 @@ const List = () => {
           1
         );
         const endDate = new Date(now.getFullYear(), now.getMonth(), 0);
-        return users.filter(
-          (user) =>
-            user.createdAt &&
-            new Date(user.createdAt) >= previousMonth &&
-            new Date(user.createdAt) <= endDate
-        );
+        return users.filter((user) => {
+          const enrollmentDate = user.dateAmazon
+            ? new Date(user.dateAmazon)
+            : user.dateWebsite
+            ? new Date(user.dateWebsite)
+            : null;
+          return (
+            enrollmentDate &&
+            enrollmentDate >= previousMonth &&
+            enrollmentDate <= endDate
+          );
+        });
       }
       case "last6months":
         startDate = new Date(now.getFullYear(), now.getMonth() - 6, 1);
@@ -157,9 +164,15 @@ const List = () => {
       default:
         return users;
     }
-    return users.filter(
-      (user) => user.createdAt && new Date(user.createdAt) >= startDate
-    );
+
+    return users.filter((user) => {
+      const enrollmentDate = user.dateAmazon
+        ? new Date(user.dateAmazon)
+        : user.dateWebsite
+        ? new Date(user.dateWebsite)
+        : null;
+      return enrollmentDate && enrollmentDate >= startDate;
+    });
   };
 
   useEffect(() => {
