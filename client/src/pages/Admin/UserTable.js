@@ -31,6 +31,8 @@ const UserTable = ({
     setSelectedManager(value);
   };
 
+  const token = localStorage.getItem("user");
+
   const showModal = (user) => {
     setSelectedUser(user);
     setIsModalVisible(true);
@@ -87,6 +89,9 @@ const UserTable = ({
     return passesFilter;
   });
 
+  const user = JSON.parse(localStorage.getItem("user"));
+  const isAdmin = user?.role === "admin";
+
   const columns = [
     {
       title: "UID",
@@ -106,10 +111,7 @@ const UserTable = ({
       dataIndex: "dateAmazon",
       render: (date) => (date ? moment(date).format("DD-MM-YYYY") : "N/A"),
     },
-    {
-      title: "E. ID AMAZON",
-      dataIndex: "enrollmentIdAmazon",
-    },
+    { title: "E. ID AMAZON", dataIndex: "enrollmentIdAmazon" },
     {
       title: "Date (WEBSITE)",
       dataIndex: "dateWebsite",
@@ -119,9 +121,12 @@ const UserTable = ({
     { title: "Batch (WEBSITE)", dataIndex: "batchWebsite" },
     { title: "Batch (AMAZON)", dataIndex: "batchAmazon" },
     { title: "Name", width: 180, dataIndex: "name" },
-    { title: "Email", dataIndex: "email" },
-    { title: "Primary Contact", dataIndex: "primaryContact" },
+
+    isAdmin && { title: "Email", dataIndex: "email" },
+    isAdmin && { title: "Primary Contact", dataIndex: "primaryContact" },
+
     { title: "Password", dataIndex: "password" },
+
     {
       title: "Assigned Managers",
       dataIndex: "managers",
@@ -142,7 +147,7 @@ const UserTable = ({
           <Tag color="red">No Managers Assigned</Tag>
         ),
     },
-    {
+    isAdmin && {
       title: "Assign Managers",
       render: (_, record) => (
         <Select
@@ -160,7 +165,7 @@ const UserTable = ({
         </Select>
       ),
     },
-    {
+    isAdmin && {
       title: "Actions",
       render: (_, record) => (
         <>
@@ -181,7 +186,7 @@ const UserTable = ({
         </>
       ),
     },
-  ];
+  ].filter(Boolean); // Removes any false/undefined values from the array
 
   const csvData = filteredUsers.map((user) => ({
     UID: user.uid,

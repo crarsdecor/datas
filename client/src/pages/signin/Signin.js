@@ -1,5 +1,3 @@
-
-
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -40,6 +38,9 @@ const Signin = () => {
       switch (decoded.role) {
         case "admin":
           navigate("/dashboard-admin");
+          break;
+        case "supervisor":
+          navigate("/dashboard-supervisor");
           break;
         default:
           navigate("/unauthorized");

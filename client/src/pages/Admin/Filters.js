@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Input, Select, Button } from "antd";
+import { Input, Select, Button, message } from "antd";
 
 const { Search } = Input;
 const { Option } = Select;
@@ -30,6 +30,12 @@ const Filters = ({ onSearch, onFilter, onEnrollmentFilter }) => {
     }
   };
 
+  const handleLogoutClick = () => {
+    localStorage.clear();
+    message.success("Logged out successfully");
+    window.location.href = "/"; // Redirect to login page
+  };
+
   return (
     <div className="flex flex-col md:flex-row justify-between items-center mb-6">
       {/* Search Bar */}
@@ -41,21 +47,12 @@ const Filters = ({ onSearch, onFilter, onEnrollmentFilter }) => {
         style={{ width: "100%", maxWidth: "300px" }}
       />
 
-      {/* Enrollment ID Filter */}
-      <Select
-        placeholder="Filter by services"
-        onChange={handleEnrollmentFilterChange}
-        // value={enrollmentFilter}
-        value={enrollmentFilter || "all"}
-        allowClear
-        className="mb-4 md:mb-0 md:mr-4"
-        style={{ width: "200px" }}
+      <Button
+        onClick={handleLogoutClick}
+        className="bg-red-500 text-white font-semibold"
       >
-        <Option value="all">All</Option>
-        <Option value="amazon">Amazon Only</Option>
-        <Option value="website">Website Only</Option>
-        <Option value="both">Amazon & Website</Option>
-      </Select>
+        Logout
+      </Button>
     </div>
   );
 };
