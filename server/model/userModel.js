@@ -24,7 +24,7 @@ const userSchema = new Schema(
     name: { type: String, required: true },
     email: { type: String },
     password: { type: String },
-    primaryContact: { type: String },
+    primaryContact: { type: String, unique: true },
     role: { type: String, enum: Object.values(ROLES), default: ROLES.USER },
     managers: [{ type: Schema.Types.ObjectId, ref: "User" }], // Array of manager references
 
