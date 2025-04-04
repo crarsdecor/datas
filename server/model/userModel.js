@@ -22,7 +22,7 @@ const paymentStageSchema = new mongoose.Schema({
 const userSchema = new Schema(
   {
     name: { type: String, required: true },
-    email: { type: String,unique:true },
+    email: { type: String, unique: true },
     password: { type: String },
     primaryContact: { type: String, unique: true },
     role: { type: String, enum: Object.values(ROLES), default: ROLES.USER },
@@ -32,8 +32,8 @@ const userSchema = new Schema(
     uid: { type: String, unique: true },
     dateAmazon: { type: String },
     dateWebsite: { type: String },
-    enrollmentIdAmazon: { type: String },
-    enrollmentIdWebsite: { type: String },
+    enrollmentIdAmazon: { type: String, unique: true },
+    enrollmentIdWebsite: { type: String, unique: true },
     batchAmazon: { type: String },
     batchWebsite: { type: String },
     // website

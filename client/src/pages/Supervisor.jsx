@@ -2,14 +2,11 @@ import React, { useEffect, useState } from "react";
 import { message } from "antd";
 import { motion } from "framer-motion";
 import axios from "axios";
-// import UserTable from "./UserTable";
-// import Footer from "../layout/Footer";
-// import Piechart from "./Piechart";
-// import Filters from "./Filters";
 import Filters from "./Admin/Filters";
 import Footer from "./layout/Footer";
 import PieChart from "./Admin/Piechart";
 import UserTable from "./Admin/UserTable";
+import UserModal from "./Admin/UserModal"; // Import UserModal
 
 const apiUrl = process.env.REACT_APP_BACKEND_URL;
 
@@ -18,6 +15,7 @@ const Supervisor = () => {
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [managers, setManagers] = useState([]);
   const [filterRange, setFilterRange] = useState("all");
+  const [isModalVisible, setIsModalVisible] = useState(false); // State for user modal
 
   const fetchUsers = async () => {
     try {
@@ -65,7 +63,7 @@ const Supervisor = () => {
 
       if (response.status === 200) {
         message.success("User updated successfully!");
-        window.location.reload();
+        fetchUsers(); // Refresh the user list
       } else {
         message.error("Failed to update user. Please try again.");
       }
@@ -87,36 +85,33 @@ const Supervisor = () => {
   };
 
   const handleSearch = (query) => {
-    const filtered = users.filter((user) => {
-      const queryLower = query.toLowerCase();
-      return (
-        user.uid?.toLowerCase().includes(queryLower) ||
-        user.name?.toLowerCase().includes(queryLower) ||
-        user.email?.toLowerCase().includes(queryLower) ||
-        user.primaryContact?.toLowerCase().includes(queryLower) ||
-        user.managers?.some((manager) =>
-          manager.name?.toLowerCase().includes(queryLower)
-        ) ||
-        user.enrollmentIdAmazon?.toLowerCase().includes(queryLower) ||
-        user.enrollmentIdWebsite?.toLowerCase().includes(queryLower) ||
-        user.batchAmazon?.toLowerCase().includes(queryLower) ||
-        user.batchWebsite?.toLowerCase().includes(queryLower)
-      );
-    });
+    const queryLower = query.toLowerCase();
+    const filtered = users.filter((user) =>
+      [
+        user.uid,
+        user.name,
+        user.email,
+        user.primaryContact,
+        user.enrollmentIdAmazon,
+        user.enrollmentIdWebsite,
+        user.batchAmazon,
+        user.batchWebsite,
+        ...(user.managers?.map((manager) => manager.name) || []),
+      ]
+        .filter(Boolean)
+        .some((field) => field.toLowerCase().includes(queryLower))
+    );
     setFilteredUsers(filtered);
   };
 
   const handleEnrollmentFilter = (filter) => {
     const filtered = users.filter((user) => {
-      if (filter === "amazon") {
+      if (filter === "amazon")
         return user.enrollmentIdAmazon && !user.enrollmentIdWebsite;
-      }
-      if (filter === "website") {
+      if (filter === "website")
         return user.enrollmentIdWebsite && !user.enrollmentIdAmazon;
-      }
-      if (filter === "both") {
+      if (filter === "both")
         return user.enrollmentIdAmazon && user.enrollmentIdWebsite;
-      }
       return true;
     });
     setFilteredUsers(filtered);
@@ -199,29 +194,20 @@ const Supervisor = () => {
         animate={{ opacity: 1 }}
         transition={{ duration: 1 }}
       >
-        {/* <div className="text-center">
-          <select
-            className="p-2 bg-gray-700 text-gray-100 rounded"
-            value={filterRange}
-            onChange={(e) => setFilterRange(e.target.value)}
+        {/* Add User Button */}
+        <div className="flex justify-end mb-4">
+          <button
+            className="bg-blue-500 text-white px-4 py-2 rounded shadow hover:bg-blue-600 transition"
+            onClick={() => setIsModalVisible(true)}
           >
-            <option value="all">All Time</option>
-            <option value="today">Today</option>
-            <option value="last7days">Last 7 Days</option>
-            <option value="thisMonth">This Month</option>
-            <option value="last30days">Last 30 Days</option>
-            <option value="lastMonth">Previous Month</option>
-            <option value="last6months">Last 6 Months</option>
-            <option value="thisYear">This Year</option>
-          </select>
-        </div> */}
+            + Add New User
+          </button>
+        </div>
+
         <Filters
           onSearch={handleSearch}
           onEnrollmentFilter={handleEnrollmentFilter}
         />
-        {/* <div className="mb-8">
-          <Piechart users={filteredUsers} />
-        </div> */}
 
         <UserTable
           users={filteredUsers}
@@ -231,7 +217,16 @@ const Supervisor = () => {
           handleUpdateUser={handleUpdateUser}
         />
       </motion.div>
+
       <Footer />
+
+      {/* User Modal for Creating Users */}
+      <UserModal
+        visible={isModalVisible}
+        onClose={() => setIsModalVisible(false)}
+        fetchUsers={fetchUsers}
+        managers={managers}
+      />
     </div>
   );
 };
